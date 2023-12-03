@@ -1,0 +1,55 @@
+//crear los nodos de las replicas
+set=new ReplSetTest({name:"ReplicaTorneoDeportivo",nodes:3})
+set.startSet()
+set.initiate()
+//Nuevo MongoShell
+conn=new Mongo("JEFFERSON:20000")
+testDB=conn.getDB("TorneoDeportivo")
+testDB.isMaster()
+testDB.Entrenadores.insert(
+{
+ "_id": 6,
+  "Nombre": "Alejandro",
+  "Apellido": "Torres",
+  "Fecha de nacimiento": "30-18-1964",
+  "Nacionalidad": "Colombiana",
+  "Equipo": "Colombia"
+});
+testDB.Entrenadores.insert(
+{
+ "_id": 7,
+ "Nombre": "Pedro",
+  "Apellido": "Rojas",
+  "Fecha de nacimiento": "30-16-1957",
+  "Nacionalidad": "Peru",
+  "Equipo": "Peru"
+});
+testDB.Entrenadores.insert(
+{
+ "_id": 8,
+ "Nombre": "Santiago Andres",
+  "Apellido": "Sanchez",
+  "Fecha de nacimiento": "24-09-1965",
+  "Nacionalidad": "Chile",
+  "Equipo": "Chile"
+});
+testDB.Entrenadores.count()
+testDB.Entrenadores.find()
+
+
+connSecondary=new Mongo("JEFFERSON:20001")
+secondaryTestDB=connSecondary.getDB("TorneoDeportivo")
+secondaryTestDB.isMaster()
+secondaryTestDB.Entrenadores.count()
+connSecondary.setSecondaryOk()
+
+connPrimary=new Mongo("localhost:20000")
+primaryDB=connPrimary.getDB("TorneoDeportivo")
+primaryDB.adminCommand({shutdown:1});
+
+
+connNewPrimary=new Mongo("localhost:20001")
+newPrimaryDB=connNewPrimary.getDB("TorneoDeportivo")
+newPrimaryDB.isMaster()
+
+ 
