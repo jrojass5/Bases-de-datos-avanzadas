@@ -1,0 +1,96 @@
+
+ayudame aresolver esta acitividad:
+Desarrollar los comandos necesarios para el particionamiento horizontal (fragmentación o sharding) de las bases de datos del evento deportivo planteado acorde al documento de requerimientos no funcionales, esto es:
+Definir la estrategia de particionamiento necesaria para cumplir los requerimientos planteados.
+Ejecutar los comandos para crear el entorno de particionamiento definido.
+
+1.Para levantar el clúster de réplica, desde la consola escribiremos el siguiente comando:
+
+cluster=new ShardingTest ({shards: 3, chunksize:1}) 
+
+2.nserción de datos sobre el balanceador Para actuar sobre el conjunto de Sharding, arrancaremos una nueva consola cliente de mongo contra el balanceador: 
+
+db = (new Mongo("localhost:20006")).getDB("TorneoDeportivo")
+
+3.ingresamos datos:
+
+Ingresamos 50,000 registros en la tabla Deportistas:
+
+for (i= 0; i < 50000; i++) {
+db.Deportistas.insert({
+_id:1+i,
+Deportista: "deportista" +i, 
+Nombre: "Recuento de Deportista"+i,
+Apellido: "Recuento de Deportista"+i, 
+FechaDeNacimiento: new Date(),
+Nacionalidad: "Recuento de Deportista"+i,
+Equipo: "Recuento de Deportista"+i
+});}
+
+db.Deportistas.count()
+
+Ingresamos 20,000 registros en la tabla Arbitros:
+
+for (i= 0; i < 25000; i++) {
+db.Arbitros.insert({
+_id:1+i,
+Nombre: "Recuento de Arbitros"+i,
+Apellido: "Recuento de Arbitros"+i, 
+FechaDeNacimiento: new Date(),
+Nacionalidad: "Recuento de Arbitros"+i,
+FIFA: "true" 
+});
+}
+
+db.Arbitros.count()
+Ingresamos 20,000 registros en la tabla MisLibros
+
+for (i= 0; i < 20000; i++) {
+db.Encuentrosdeportivos.insert({
+_id:1+i, 
+Equipo1 : "Recuento de quipo" +i,
+Equipo2 : "Recuento de quipo" +i,
+fecha: new Date(),
+Hora: "Recuento de hora" +i,
+Lugar: "Recuento de lugar"+i
+});}
+
+db.Encuentrosdeportivos.count()
+4. Comprobación de la distribución de datos en los nodos:
+shard1 = new Mongo("localhost:20000")
+shard1DB = shard1.getDB("TorneoDeportivo")
+shard1DB.Arbitros.count()
+shard1DB.Deportistas.count()
+shard1DB.Encuentrosdeportivos.count()
+
+shard2 = new Mongo("localhost:20001")
+shard2DB = shard1.getDB("TorneoDeportivo")
+shard2DB.Arbitros.count()
+shard2DB.Deportistas.count()
+shard2DB.Encuentrosdeportivos.count()
+
+shard3 = new Mongo("localhost:20002")
+shard3DB = shard1.getDB("TorneoDeportivo")
+shard3DB.Arbitros.count()
+shard3DB.Deportistas.count()
+shard3DB.Encuentrosdeportivos.count()
+
+5.Activación del Sharding:
+shard1 = new Mongo("localhost:20006")
+sh.status()
+
+sh.enableSharding("TorneoDeportivo")
+db.Deportistas.ensureIndex({Deportista: 1})
+sh.shardCollection("TorneoDeportivo.Deportistas", {Deportista: 1})
+6.Activación del balanceador de carga:
+sh.getBalancerState()
+sh.setBalancerState(true)
+sh.getBalancerState()
+sh.isBalancerRunning()
+
+7.Conocer el listado de los Shards activos:
+db.adminCommand( { listShards: 1 } )
+
+8.Parada del clúster de particionado de datos
+cluster.stop()
+
