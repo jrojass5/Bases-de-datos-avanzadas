@@ -1,9 +1,3 @@
-
-ayudame aresolver esta acitividad:
-Desarrollar los comandos necesarios para el particionamiento horizontal (fragmentación o sharding) de las bases de datos del evento deportivo planteado acorde al documento de requerimientos no funcionales, esto es:
-Definir la estrategia de particionamiento necesaria para cumplir los requerimientos planteados.
-Ejecutar los comandos para crear el entorno de particionamiento definido.
-
 1.Para levantar el clúster de réplica, desde la consola escribiremos el siguiente comando:
 
 cluster=new ShardingTest ({shards: 3, chunksize:1}) 
